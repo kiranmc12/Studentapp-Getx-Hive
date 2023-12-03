@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:studentapp_provider/screens/home/home.dart';
 
 class SearchFieldWidget extends StatelessWidget {
-  const SearchFieldWidget({
+  SearchFieldWidget({
     super.key,
+    required this.searchController,
   });
+  final TextEditingController searchController;
 
   @override
   Widget build(BuildContext context) {
     return TextField(
-      onChanged: (value) {
+      onChanged: (value) async {
+        await studentViewController.getStudents(value);
       },
-      style: const TextStyle(color: Colors.white),
+      style: TextStyle(color: Colors.white),
+      controller: searchController,
       decoration: InputDecoration(
         filled: true,
         fillColor: const Color.fromARGB(255, 43, 43, 43),
@@ -25,4 +30,3 @@ class SearchFieldWidget extends StatelessWidget {
     );
   }
 }
-

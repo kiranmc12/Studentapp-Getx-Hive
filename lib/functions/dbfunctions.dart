@@ -12,7 +12,6 @@ class HiveDb {
           DateTime.now().minute +
           DateTime.now().microsecond;
       await db.put(model.id, model);
-      print("adderdddd");
     } catch (e) {
       return false;
     }

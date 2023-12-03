@@ -3,9 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:studentapp_provider/core/colors.dart';
 import 'package:studentapp_provider/core/constants.dart';
-import 'package:studentapp_provider/functions/student_controller.dart';
 import 'package:studentapp_provider/functions/validator_functions.dart';
 import 'package:studentapp_provider/model/modelstudent.dart';
 import 'package:studentapp_provider/screens/home/home.dart';
@@ -27,12 +25,14 @@ class AddEditScreen extends StatelessWidget {
   final Student? model;
   final ActionType action;
 
-  AddEditScreen({Key? key, required this.action,  this.model}) : super(key: key);
+  AddEditScreen({Key? key, required this.action, this.model}) : super(key: key);
 
   void clear() {
     nameController.clear();
     ageController.clear();
     phoneController.clear();
+    departmentController.clear();
+    image.value = null;
   }
 
   @override
@@ -124,9 +124,14 @@ class AddEditScreen extends StatelessWidget {
                           department: departmentController.text,
                         );
 
-                        await studentViewController
-                            .addOrEdit(student, action == ActionType.edit);
+                        await studentViewController.addOrEdit(
+                            student, action == ActionType.edit);
 
+                            action==ActionType.add?
+                         Get.snackbar("Successful", "Data added Successfully",colorText: kWhite,backgroundColor: Colors.green)
+                         : Get.snackbar("Saved Changes", "Data saved Successfully",colorText: kWhite,backgroundColor: Colors.green);
+                        Get.off(HomeScreen());
+                        
                         clear();
                       }
                     },

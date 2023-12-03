@@ -5,14 +5,15 @@ import 'package:studentapp_provider/model/modelstudent.dart';
 class StudentController extends GetxController {
   HiveDb hive = HiveDb();
 
-  List<Student> studentList = <Student>[].obs;
+  RxList<Student> studentList = <Student>[].obs;
 
-  Future<void> getStudents(String name) async {
+ Future<void> getStudents(String name) async {
     List<Student> tempList = await hive.getData();
 
-    studentList = tempList
+    studentList.assignAll(tempList
         .where((model) => model.name.toLowerCase().contains(name.toLowerCase()))
-        .toList();
+        .toList());
+        
   }
 
   Future<void> addOrEdit(Student model, bool toEdit) async {

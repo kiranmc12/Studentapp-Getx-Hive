@@ -1,17 +1,25 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:studentapp_provider/core/constants.dart';
 import 'package:studentapp_provider/functions/student_controller.dart';
+import 'package:studentapp_provider/model/modelstudent.dart';
 import 'package:studentapp_provider/screens/add_edit/add_student.dart';
 import 'package:studentapp_provider/screens/home/widgets/search_widget.dart';
+import 'package:studentapp_provider/screens/profile.dart';
 import 'package:studentapp_provider/screens/widgets/circle_image_widget.dart';
 
 final StudentController studentViewController = Get.put(StudentController());
+  final TextEditingController searchController = TextEditingController();
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    studentViewController.getStudents('');
+
     return Scaffold(
         appBar: AppBar(
           title: Text("students"),
@@ -19,7 +27,7 @@ class HomeScreen extends StatelessWidget {
         body: SafeArea(
             child: Column(
           children: [
-            Padding(
+            const Padding(
               padding: EdgeInsets.only(left: 20),
               child: Align(
                 alignment: Alignment.topLeft,
@@ -29,9 +37,9 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
-            Padding(
+             Padding(
               padding: EdgeInsets.all(12.0),
-              child: SearchFieldWidget(),
+              child: SearchFieldWidget(searchController: searchController),
             ),
             Expanded(
               child: ListViewHome(),
@@ -47,14 +55,13 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class ListViewHome extends GetView {
+class ListViewHome extends StatelessWidget {
   ListViewHome({
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-   studentViewController.getStudents('');
     return GetX<StudentController>(
       builder: (controller) {
         return ListView.builder(
@@ -62,11 +69,15 @@ class ListViewHome extends GetView {
           shrinkWrap: true,
           itemCount: controller.studentList.length,
           itemBuilder: (context, index) {
+            final studentdata = controller.studentList[index];
+
             return ListTile(
+              onTap: () {
+                Get.to(ProfileTile(model: studentdata));
+              },
               leading: CircleImageWidget(
                 radius: 40,
-                image:
-                    controller.studentList[index].image,
+                image: controller.studentList[index].image,
               ),
               title: Text(controller.studentList[index].name),
               subtitle: Text(controller.studentList[index].department!),
@@ -74,17 +85,23 @@ class ListViewHome extends GetView {
                 children: [
                   IconButton(
                       onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => AddEditScreen(
-                                    action: ActionType.edit,
-                                    model: controller.studentList[index])));
+                        Get.to(AddEditScreen(
+                          action: ActionType.edit,
+                          model: studentdata,
+                        ));
+
+                        setData(controller.studentList[index]);
                       },
                       icon: const Icon(Icons.edit)),
-                  IconButton(onPressed: () {
-
-                  }, icon: Icon(Icons.delete)),
+                  IconButton(
+                      onPressed: () async {
+                        controller.deleteModel(studentdata.id!);
+                        Get.snackbar("Deleted Sucessfully", " ",
+                            backgroundColor: Colors.red,
+                            colorText: kWhite,
+                            snackPosition: SnackPosition.BOTTOM);
+                      },
+                      icon: Icon(Icons.delete)),
                 ],
               ),
             );
@@ -93,4 +110,12 @@ class ListViewHome extends GetView {
       },
     );
   }
+}
+
+setData(Student model) {
+  nameController.text = model.name;
+  ageController.text = model.age;
+  departmentController.text = model.department!;
+  phoneController.text = model.phone;
+  image.value = model.image != null ? File(model.image!) : null;
 }
